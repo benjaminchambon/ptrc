@@ -343,3 +343,11 @@ html,body{max-width:100%;overflow-x:hidden}
 }
 
 .maps-link{color:inherit;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:rgba(225,29,72,.45)}.maps-link:hover{text-decoration-color:currentColor}
+
+/* Video / club-life cleanup */
+.tag-video-section{display:grid;grid-template-columns:.72fr 1.28fr;gap:54px;align-items:center}
+.tag-video-copy{max-width:460px}
+.club-life-gallery-wide{grid-template-columns:repeat(4,1fr)}
+.club-life-gallery-wide img{height:280px}
+@media(max-width:900px){.tag-video-section{grid-template-columns:1fr;gap:28px}.club-life-gallery-wide{grid-template-columns:1fr 1fr}.club-life-gallery-wide img{height:240px}}
+@media(max-width:560px){.club-life-gallery-wide{grid-template-columns:1fr}.club-life-gallery-wide img{height:230px}}
