@@ -272,3 +272,74 @@ html,body{max-width:100%;overflow-x:hidden}
   .first-session-lead { font-size: 1rem; }
   .first-session-points { gap: .8rem; }
 }
+
+
+/* PTRC language selector */
+.language-switcher{display:inline-flex;align-items:center;gap:2px;padding:3px;border:1px solid rgba(11,23,40,.14);border-radius:999px;background:rgba(255,255,255,.72);margin-left:auto;margin-right:10px;flex:0 0 auto}
+.site-header:not(.inner):not(.scrolled) .language-switcher{border-color:rgba(255,255,255,.28);background:rgba(6,25,45,.28)}
+.lang-button{appearance:none;border:0;background:transparent;color:var(--ink);font:inherit;font-size:11px;font-weight:900;letter-spacing:.05em;line-height:1;padding:7px 9px;border-radius:999px;cursor:pointer;transition:background .18s ease,color .18s ease}
+.lang-button.active{background:var(--blue);color:#fff}
+.site-header:not(.inner):not(.scrolled) .lang-button{color:#fff}
+.site-header:not(.inner):not(.scrolled) .lang-button.active{background:#fff;color:var(--ink)}
+@media(max-width:900px){.language-switcher{margin-left:auto;margin-right:8px}.lang-button{padding:7px 8px}.nav-wrap .menu-toggle{order:3}.nav-wrap .language-switcher{order:2}.nav-wrap .brand{order:1}.nav-wrap .nav{order:4}}
+@media(max-width:420px){.brand-name{display:none}.language-switcher{margin-right:4px}.lang-button{font-size:10px;padding:6px 7px}}
+
+/* Header — current page state */
+.nav > a:not(.button){position:relative}
+.nav > a[aria-current="page"]{font-weight:900;color:var(--blue)}
+.nav > a[aria-current="page"]::after{content:"";position:absolute;left:4px;right:4px;bottom:-10px;height:3px;border-radius:999px;background:var(--blue)}
+.site-header:not(.inner):not(.scrolled) .nav > a[aria-current="page"]{color:#fff}
+.site-header:not(.inner):not(.scrolled) .nav > a[aria-current="page"]::after{background:#fff}
+@media(max-width:900px){
+  .nav > a[aria-current="page"]{background:rgba(35,99,183,.10);border-radius:10px;padding-left:12px!important;color:var(--blue)!important}
+  .nav > a[aria-current="page"]::after{display:none}
+}
+
+/* Training — make the first-session reassurance unmistakable */
+.first-session-card{position:relative;overflow:hidden;background:linear-gradient(145deg,#071c35 0%,#0d3158 100%);border:1px solid rgba(255,255,255,.12)}
+.first-session-card::before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:var(--red)}
+.first-session-card > div{position:relative;z-index:1}
+.first-session-card .eyebrow{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;color:#fff;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:8px 11px;font-size:11px;letter-spacing:.09em}
+.first-session-card h3{font-size:clamp(34px,4vw,48px);line-height:1.02;letter-spacing:-.04em;max-width:560px;margin:0 0 18px;color:#fff}
+.first-session-lead{font-size:1.12rem;line-height:1.6;max-width:570px;margin-bottom:1.8rem;color:rgba(255,255,255,.88)}
+.first-session-points{gap:0;border-top:1px solid rgba(255,255,255,.15)}
+.first-session-points p{padding:16px 0;border-top:0;border-bottom:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.76)}
+.first-session-points p:last-child{border-bottom:0;padding-bottom:0}
+.first-session-points strong{display:inline-block;margin-bottom:4px;font-size:15px;color:#fff}
+@media(max-width:720px){
+  .first-session-card h3{font-size:32px}
+  .first-session-lead{font-size:1rem;margin-bottom:1.4rem}
+  .first-session-card .eyebrow{font-size:10px}
+}
+
+
+.tag-video-shell{
+  width:100%;
+  overflow:hidden;
+  border-radius:20px;
+  background:#000;
+  aspect-ratio:16/9;
+}
+.tag-video{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+}
+@media (max-width: 640px){
+  .tag-video-shell{border-radius:14px; aspect-ratio:4/3;}
+}
+
+/* Header language switch — keep it at the far right */
+@media (min-width:901px){
+  .site-header .nav{margin-left:auto}
+  .site-header .language-switcher{margin-left:0;margin-right:0}
+}
+@media (max-width:900px){
+  .nav-wrap .brand{order:1}
+  .nav-wrap .menu-toggle{order:2;margin-left:auto}
+  .nav-wrap .language-switcher{order:3;margin-left:6px;margin-right:0}
+  .nav-wrap .nav{order:4}
+}
+
+.maps-link{color:inherit;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:rgba(225,29,72,.45)}.maps-link:hover{text-decoration-color:currentColor}
