@@ -351,3 +351,120 @@ html,body{max-width:100%;overflow-x:hidden}
 .club-life-gallery-wide img{height:280px}
 @media(max-width:900px){.tag-video-section{grid-template-columns:1fr;gap:28px}.club-life-gallery-wide{grid-template-columns:1fr 1fr}.club-life-gallery-wide img{height:240px}}
 @media(max-width:560px){.club-life-gallery-wide{grid-template-columns:1fr}.club-life-gallery-wide img{height:230px}}
+
+/* PTRC social icons + header signup: additive only */
+.footer-socials{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin-top:4px}
+.footer-socials .social-link{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid rgba(255,255,255,.18);border-radius:50%;color:#fff;opacity:.72;transition:opacity .18s ease,transform .18s ease,border-color .18s ease}
+.footer-socials .social-link:hover{opacity:1;transform:translateY(-2px);border-color:rgba(255,255,255,.45)}
+.footer-socials svg{width:17px;height:17px;fill:currentColor;stroke:currentColor;stroke-width:1.7;vector-effect:non-scaling-stroke}
+.footer-socials svg rect,.footer-socials svg circle{fill:none}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+@media(max-width:900px){.nav .header-signup{margin-top:0}}
+
+/* Header CTA spacing fix — keep both actions readable without changing the header design */
+.site-header .nav > .button-small{
+  flex:0 0 auto;
+  white-space:nowrap;
+  padding-left:20px;
+  padding-right:20px;
+}
+.site-header .nav > .button-small:not(.header-signup){min-width:118px}
+.site-header .nav > .header-signup{min-width:108px}
+@media(max-width:900px){
+  .site-header .nav > .button-small{
+    width:100%;
+    min-width:0;
+    padding-left:18px;
+    padding-right:18px;
+  }
+}
+
+.feature-card.sans-contact-photo{background-image:url('assets/tag-no-tackle.jpg');background-position:center 48%;}
+
+/* Header: keep navigation tabs on one line on desktop */
+@media(min-width:901px){
+  .site-header .nav{flex-wrap:nowrap;white-space:nowrap;gap:16px}
+  .site-header .nav > a{white-space:nowrap;flex:0 0 auto}
+  .site-header .nav-wrap{gap:16px}
+}
+
+/* Home — mixed card photo + minimal trial journey */
+.feature-card.mixed-photo{
+  background-image:url('assets/vraiment-mixte.jpg');
+  background-position:center 42%;
+}
+
+.trial-steps{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0;
+  margin-top:56px;
+  padding-top:4px;
+}
+.trial-steps::before{
+  content:"";
+  position:absolute;
+  left:16.666%;
+  right:16.666%;
+  top:17px;
+  height:1px;
+  background:var(--line);
+  transform:scaleX(0);
+  transform-origin:left center;
+  transition:transform .75s cubic-bezier(.2,.8,.2,1);
+}
+.trial-steps.is-visible::before{transform:scaleX(1)}
+.trial-step{
+  position:relative;
+  padding:0 34px 0 0;
+  opacity:0;
+  transform:translateY(12px);
+  transition:opacity .45s ease,transform .45s ease;
+}
+.trial-step:nth-child(2){transition-delay:.12s}
+.trial-step:nth-child(3){transition-delay:.24s}
+.trial-steps.is-visible .trial-step{opacity:1;transform:none}
+.trial-step-number{
+  position:relative;
+  z-index:1;
+  display:block;
+  width:36px;
+  margin-bottom:22px;
+  background:var(--bg);
+  color:var(--blue);
+  font-size:26px;
+  line-height:1.2;
+  font-weight:800;
+  letter-spacing:-.04em;
+}
+.trial-step-copy{padding-right:20px}
+.trial-step h3{font-size:24px;margin:0 0 10px}
+.trial-step p{margin:0;color:var(--muted);max-width:300px}
+.trial-step .text-link{display:inline-block;margin-top:14px}
+
+@media(max-width:760px){
+  .trial-steps{grid-template-columns:1fr;gap:0;margin-top:36px;padding-left:2px}
+  .trial-steps::before{
+    left:17px;
+    right:auto;
+    top:17px;
+    bottom:22px;
+    width:1px;
+    height:auto;
+    transform:scaleY(0);
+    transform-origin:center top;
+  }
+  .trial-steps.is-visible::before{transform:scaleY(1)}
+  .trial-step{display:grid;grid-template-columns:36px minmax(0,1fr);gap:18px;padding:0 0 30px}
+  .trial-step:last-child{padding-bottom:0}
+  .trial-step-number{margin:0}
+  .trial-step-copy{padding:5px 0 0}
+  .trial-step h3{font-size:21px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .trial-steps::before,.trial-step{transition:none!important}
+  .trial-steps::before{transform:none!important}
+  .trial-step{opacity:1!important;transform:none!important}
+}
