@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <meta name="robots" content="noindex,nofollow"/>
-  <title>PTRC Admin — Actualités</title>
+  <title>PTRC Admin — Connexion</title>
   <link href="../favicon.ico" rel="icon" sizes="any"/>
   <link href="admin.css" rel="stylesheet"/>
 </head>
@@ -12,69 +12,22 @@
   <main class="admin-shell">
     <header class="admin-header">
       <a class="admin-brand" href="../index.html"><img src="../logo-paris-tag-rugby.png" alt="Paris Tag Rugby Club"/><span>PTRC <strong>Admin</strong></span></a>
-      <div class="admin-header-actions" data-authenticated hidden>
-        <a href="../actualites.html" target="_blank" rel="noreferrer">Voir la page publique ↗</a>
-        <button class="admin-link-button" id="logout" type="button">Se déconnecter</button>
-      </div>
     </header>
 
     <section class="admin-login" id="login-panel">
       <div class="admin-login-card">
         <span class="admin-eyebrow">Administration</span>
-        <h1>Actualités du club</h1>
-        <p>Connecte-toi pour publier et modifier les actualités du PTRC.</p>
+        <h1>Connexion</h1>
+        <p>Connecte-toi pour gérer les actualités du PTRC.</p>
         <form id="login-form">
           <label>Email<input autocomplete="username" id="login-email" type="email" required/></label>
           <label>Mot de passe<input autocomplete="current-password" id="login-password" type="password" required/></label>
-          <button class="admin-primary" type="submit">Se connecter</button>
+          <button class="admin-primary" id="login-submit" type="submit">Se connecter</button>
           <p class="admin-error" id="login-error" role="alert"></p>
         </form>
       </div>
     </section>
-
-    <section class="admin-app" id="admin-app" hidden>
-      <div class="admin-toolbar">
-        <div><span class="admin-eyebrow">Contenu</span><h1>Actualités</h1><p>Crée, prépare ou publie une actualité sur la page dédiée.</p></div>
-        <button class="admin-primary" id="new-news" type="button">+ Nouvelle actualité</button>
-      </div>
-
-      <div class="admin-layout">
-        <section class="admin-list-panel">
-          <div class="admin-list-head"><strong>Articles</strong><span id="news-count"></span></div>
-          <div class="admin-news-list" id="news-list"><p class="admin-muted">Chargement…</p></div>
-        </section>
-
-        <section class="admin-editor" id="editor" hidden>
-          <div class="admin-editor-head"><div><span class="admin-eyebrow" id="editor-kicker">Nouvelle actualité</span><h2 id="editor-title">Créer l’actualité</h2></div><button class="admin-close" id="cancel-edit" type="button" aria-label="Fermer">×</button></div>
-          <form id="news-form">
-            <input id="news-id" type="hidden"/>
-            <div class="admin-form-grid two-cols">
-              <label>Date<input id="news-date" type="date" required/></label>
-              <label class="admin-check"><input id="news-published" type="checkbox"/><span>Publié</span></label>
-            </div>
-            <div class="admin-language-block"><span>Français</span>
-              <label>Titre<input id="title-fr" maxlength="160" required/></label>
-              <label>Résumé<textarea id="excerpt-fr" maxlength="400" rows="3"></textarea></label>
-              <label>Contenu<textarea id="body-fr" maxlength="12000" rows="8"></textarea></label>
-            </div>
-            <div class="admin-language-block"><span>English</span>
-              <label>Title<input id="title-en" maxlength="160"/></label>
-              <label>Summary<textarea id="excerpt-en" maxlength="400" rows="3"></textarea></label>
-              <label>Content<textarea id="body-en" maxlength="12000" rows="8"></textarea></label>
-            </div>
-            <div class="admin-media-block">
-              <label>Photo<input id="news-image" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" type="file"/></label>
-              <input id="image-url" type="hidden"/>
-              <div class="admin-image-preview" id="image-preview" hidden><img alt="Aperçu"/><button id="remove-image" type="button">Retirer</button></div>
-              <small>JPEG, PNG, WebP, GIF ou AVIF · 5 Mo maximum.</small>
-            </div>
-            <div class="admin-form-actions"><button class="admin-secondary" id="cancel-edit-bottom" type="button">Annuler</button><button class="admin-primary" id="save-news" type="submit">Enregistrer</button></div>
-            <p class="admin-error" id="editor-error" role="alert"></p>
-          </form>
-        </section>
-      </div>
-    </section>
   </main>
-  <script type="module" src="admin.js"></script>
+  <script type="module" src="login.js"></script>
 </body>
 </html>

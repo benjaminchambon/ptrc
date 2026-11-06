@@ -65,7 +65,7 @@ Les données Netlify sont stockées dans les stores `ptrc-content` et `ptrc-medi
 - un seul compte admin configuré par variables d’environnement ;
 - pas encore de gestion d’utilisateurs dans l’UI ;
 - suppression d’une actualité ne supprime pas encore son ancienne image du stockage ;
-- taille d’image limitée à 5 Mo ;
+- taille d’image limitée à 4 Mo ;
 - contenu texte simple, sans éditeur riche.
 
 Ces limites permettent de valider le workflow avant d’ajouter comptes, rôles et PostgreSQL.
