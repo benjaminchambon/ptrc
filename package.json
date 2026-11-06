@@ -8,6 +8,9 @@
     "hash-password": "node scripts/hash-password.mjs"
   },
   "dependencies": {
-    "@netlify/blobs": "^11.1.8"
+    "@netlify/blobs": "11.1.7"
+  },
+  "overrides": {
+    "@netlify/otel": "7.0.6"
   }
 }
