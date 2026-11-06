@@ -33,6 +33,13 @@ Object.assign(PTRC_TRANSLATIONS, {
   "Carte interactive des tournois 2027":"Interactive map of 2027 tournaments",
   "Calendrier des tournois 2027":"2027 tournament calendar"
 });
+Object.assign(PTRC_TRANSLATIONS, {
+  "✓ 2 séances gratuites":"✓ 2 free sessions",
+  "Le prochain rendez-vous.":"The next get-together.",
+  "Apéros, sorties et événements du club sont annoncés directement sur Meetup.":"Club drinks, outings and events are announced directly on Meetup.",
+  "Voir les prochains événements →":"See upcoming events →",
+  "Tag Rugby international":"International Tag Rugby"
+});
 const PTRC_ORIGINAL_TEXT = new WeakMap();
 const PTRC_ORIGINAL_ATTRS = new WeakMap();
 

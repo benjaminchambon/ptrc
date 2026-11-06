@@ -529,3 +529,35 @@ html,body{max-width:100%;overflow-x:hidden}
   .trial-step-arrow span::before{content:'↓'}
   .trial-step-arrow span{font-size:0}
 }
+
+
+/* Feedback pass — simplified information hierarchy */
+.home-discovery-flow .home-feature-grid{margin-top:44px}
+.trial-flow-head{margin-top:76px;padding-top:58px;border-top:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.55fr);column-gap:64px;align-items:end}
+.trial-flow-head .eyebrow{grid-column:1/-1;margin-bottom:14px}
+.trial-flow-head h2{margin:0}
+.trial-flow-head p{margin:0;color:var(--muted);line-height:1.7}
+.trial-step-membership .trial-step-copy{padding-right:0}
+.trial-price-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0 2px}
+.trial-price{display:grid;gap:1px;padding:14px 14px 13px;border-radius:15px;background:var(--blue);color:#fff;box-shadow:0 12px 28px rgba(35,99,183,.14)}
+.trial-price strong{font-size:28px;line-height:1;font-weight:900;letter-spacing:-.045em}
+.trial-price span{font-size:12px;font-weight:750;opacity:.82}
+.tag-international-section{background:#f4f1e9}
+.tag-international-layout{display:grid;grid-template-columns:minmax(0,.8fr) minmax(420px,1.2fr);gap:54px;align-items:stretch}
+.tag-international-copy{align-self:center;padding:18px 0}
+.tag-international-copy p{max-width:590px;color:var(--muted);font-size:17px;line-height:1.75}
+.tag-international-actions{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin-top:28px}
+.tag-international-visual{min-height:390px;border-radius:24px;background:linear-gradient(115deg,rgba(3,20,42,.12),rgba(3,20,42,.02)),url('assets/world-cup-ireland-2023.jpg') center 36%/cover no-repeat}
+.club-partner-section{background:#fff}
+.club-partner-grid{max-width:430px;margin-top:34px}
+.club-meetup-section{padding-top:0}
+@media(max-width:900px){
+  .trial-flow-head{grid-template-columns:1fr;gap:16px;margin-top:58px;padding-top:46px}
+  .tag-international-layout{grid-template-columns:1fr;gap:30px}
+  .tag-international-visual{min-height:330px;order:-1}
+}
+@media(max-width:560px){
+  .trial-price-grid{grid-template-columns:1fr}
+  .trial-price strong{font-size:26px}
+  .tag-international-visual{min-height:260px;border-radius:18px}
+}
