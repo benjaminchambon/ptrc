@@ -21,3 +21,7 @@ Prototype statique multi-pages orienté conversion.
 - Connecter le formulaire de contact à un backend / plugin WordPress / service de formulaire.
 - Vérifier les horaires et modalités d'accueil des nouveaux avant publication, car les sources historiques du site se contredisent parfois ; cette version suit la page Meetup récente.
 - Idéalement remplacer les images distantes par des photos locales optimisées WebP et le logo officiel en SVG.
+
+## Backoffice POC
+
+Une V1 portable du backoffice Actualités est disponible dans `/admin/`. Voir `README-ADMIN.md`.

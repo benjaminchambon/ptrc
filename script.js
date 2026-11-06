@@ -40,6 +40,15 @@ Object.assign(PTRC_TRANSLATIONS, {
   "Voir les prochains événements →":"See upcoming events →",
   "Tag Rugby international":"International Tag Rugby"
 });
+
+Object.assign(PTRC_TRANSLATIONS, {
+  "Dernières nouvelles":"Latest news",
+  "La vie du PTRC.":"Life at PTRC.",
+  "Retrouve ici les actualités publiées par le club.":"Find the latest news published by the club here.",
+  "Chargement des actualités…":"Loading news…",
+  "Voir les actualités du club →":"See club news →"
+});
+
 const PTRC_ORIGINAL_TEXT = new WeakMap();
 const PTRC_ORIGINAL_ATTRS = new WeakMap();
 

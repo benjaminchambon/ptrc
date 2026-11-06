@@ -1,0 +1,13 @@
+{
+  "name": "ptrc-website",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server/local-server.mjs",
+    "hash-password": "node scripts/hash-password.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^11.1.8"
+  }
+}
