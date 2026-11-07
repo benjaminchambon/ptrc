@@ -86,3 +86,8 @@ OPENAI_MODEL=gpt-6-luna
 - `/api/ai/translate` : route protégée par la session admin ; génère les champs anglais à partir des champs français.
 - La clé OpenAI reste exclusivement côté serveur et ne doit jamais être ajoutée dans GitHub.
 - Pour éviter une consommation inattendue, définir également un budget / usage limit sur le projet API OpenAI.
+
+
+## Assistant IA flottant
+
+L'assistant FAQ est affiché sur toutes les pages publiques via `script.js`. Il utilise `POST /api/ai/faq` et conserve les derniers échanges uniquement dans la page courante pour comprendre les questions de suivi. La clé OpenAI reste côté serveur dans `OPENAI_API_KEY`.

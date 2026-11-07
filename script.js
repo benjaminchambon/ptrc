@@ -358,54 +358,198 @@ if (ptrcTrialSteps) {
   slot.appendChild(loader);
 })();
 
-// Intelligent FAQ — public, grounded only in verified PTRC information server-side.
+// PTRC AI assistant — floating chatbot available across all public pages.
 (() => {
-  const root = document.querySelector('[data-ai-faq]');
-  if (!root) return;
-  const form = root.querySelector('[data-faq-form]');
-  const input = root.querySelector('[data-faq-input]');
-  const submit = root.querySelector('[data-faq-submit]');
-  const answer = root.querySelector('[data-faq-answer]');
-  const answerText = root.querySelector('[data-faq-answer-text]');
-  const suggestions = root.querySelectorAll('[data-faq-suggestion]');
-  if (!form || !input || !submit || !answer || !answerText) return;
-
   const copy = {
-    fr: { loading: 'Je cherche…', error: 'Je n’arrive pas à répondre pour le moment. Tu peux contacter directement le club.', notConfigured: 'La FAQ IA n’est pas encore configurée. Tu peux contacter directement le club.' },
-    en: { loading: 'Checking…', error: 'I can’t answer right now. You can contact the club directly.', notConfigured: 'The AI FAQ is not configured yet. You can contact the club directly.' }
+    fr: {
+      launcher: 'Une question ?',
+      title: 'Assistant PTRC',
+      subtitle: 'Pose-moi une question sur le club',
+      welcome: 'Bonjour 👋 Je peux t’aider sur les entraînements, les tarifs, les règles, les premières séances ou les tournois.',
+      placeholder: 'Écris ta question…',
+      send: 'Envoyer',
+      loading: 'Je cherche…',
+      error: 'Je n’arrive pas à répondre pour le moment. Tu peux contacter directement le club.',
+      notConfigured: 'L’assistant IA n’est pas encore configuré. Tu peux contacter directement le club.',
+      note: 'Réponses basées sur les informations du PTRC.',
+      contact: 'Contacter le club',
+      close: 'Fermer le chat',
+      suggestions: ['Je débute, je peux venir ?', 'Combien coûte l’adhésion ?', 'Quand sont les entraînements ?']
+    },
+    en: {
+      launcher: 'A question?',
+      title: 'PTRC Assistant',
+      subtitle: 'Ask me anything about the club',
+      welcome: 'Hi 👋 I can help with training, fees, rules, first sessions or tournaments.',
+      placeholder: 'Type your question…',
+      send: 'Send',
+      loading: 'Checking…',
+      error: 'I can’t answer right now. You can contact the club directly.',
+      notConfigured: 'The AI assistant is not configured yet. You can contact the club directly.',
+      note: 'Answers are based on PTRC information.',
+      contact: 'Contact the club',
+      close: 'Close chat',
+      suggestions: ['I’m a beginner — can I join?', 'How much is membership?', 'When is training?']
+    }
   };
 
-  suggestions.forEach((button) => button.addEventListener('click', () => {
-    input.value = button.textContent.trim();
-    input.focus();
-  }));
+  const root = document.createElement('div');
+  root.className = 'ptrc-chat';
+  root.innerHTML = `
+    <section class="ptrc-chat-panel" data-chat-panel hidden aria-label="Assistant PTRC">
+      <header class="ptrc-chat-header">
+        <div class="ptrc-chat-brand">
+          <img src="logo-paris-tag-rugby.png" alt="" aria-hidden="true">
+          <div><strong data-chat-title></strong><span data-chat-subtitle></span></div>
+        </div>
+        <button class="ptrc-chat-close" data-chat-close type="button" aria-label="Fermer le chat">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </header>
+      <div class="ptrc-chat-messages" data-chat-messages aria-live="polite"></div>
+      <div class="ptrc-chat-suggestions" data-chat-suggestions></div>
+      <form class="ptrc-chat-form" data-chat-form>
+        <label class="sr-only" for="ptrc-chat-input">Question</label>
+        <input id="ptrc-chat-input" data-chat-input maxlength="500" autocomplete="off" required>
+        <button data-chat-submit type="submit" aria-label="Envoyer">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+      <footer class="ptrc-chat-footer"><span data-chat-note></span><a href="contact.html" data-chat-contact></a></footer>
+    </section>
+    <button class="ptrc-chat-launcher" data-chat-launcher type="button" aria-expanded="false" aria-controls="ptrc-chat-panel">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M21 11.5a8.2 8.2 0 0 1-8.5 8.2 9.6 9.6 0 0 1-3.8-.8L3 21l1.8-5a8.1 8.1 0 0 1-1.3-4.5A8.2 8.2 0 0 1 12 3.3a8.2 8.2 0 0 1 9 8.2Z"/></svg>
+      <span data-chat-launcher-label></span>
+    </button>`;
+  document.body.appendChild(root);
+
+  const panel = root.querySelector('[data-chat-panel]');
+  panel.id = 'ptrc-chat-panel';
+  const launcher = root.querySelector('[data-chat-launcher]');
+  const close = root.querySelector('[data-chat-close]');
+  const messages = root.querySelector('[data-chat-messages]');
+  const suggestions = root.querySelector('[data-chat-suggestions]');
+  const form = root.querySelector('[data-chat-form]');
+  const input = root.querySelector('[data-chat-input]');
+  const submit = root.querySelector('[data-chat-submit]');
+  const conversation = [];
+  let waiting = false;
+
+  function lang() { return document.documentElement.lang === 'en' ? 'en' : 'fr'; }
+
+  function appendMessage(role, text, { temporary = false, error = false } = {}) {
+    const item = document.createElement('div');
+    item.className = `ptrc-chat-message ${role === 'user' ? 'is-user' : 'is-assistant'}${temporary ? ' is-temporary' : ''}${error ? ' is-error' : ''}`;
+    item.textContent = text;
+    messages.appendChild(item);
+    messages.scrollTop = messages.scrollHeight;
+    return item;
+  }
+
+  function renderSuggestions() {
+    const c = copy[lang()];
+    suggestions.innerHTML = '';
+    if (conversation.length) {
+      suggestions.hidden = true;
+      return;
+    }
+    suggestions.hidden = false;
+    c.suggestions.forEach((text) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = text;
+      button.addEventListener('click', () => {
+        input.value = text;
+        input.focus();
+      });
+      suggestions.appendChild(button);
+    });
+  }
+
+  function renderLanguage() {
+    const c = copy[lang()];
+    root.querySelector('[data-chat-title]').textContent = c.title;
+    root.querySelector('[data-chat-subtitle]').textContent = c.subtitle;
+    root.querySelector('[data-chat-launcher-label]').textContent = c.launcher;
+    root.querySelector('[data-chat-note]').textContent = c.note;
+    root.querySelector('[data-chat-contact]').textContent = c.contact;
+    close.setAttribute('aria-label', c.close);
+    input.placeholder = c.placeholder;
+    submit.setAttribute('aria-label', c.send);
+    panel.setAttribute('aria-label', c.title);
+    if (!conversation.length) {
+      messages.innerHTML = '';
+      appendMessage('assistant', c.welcome);
+    }
+    renderSuggestions();
+  }
+
+  function openPanel() {
+    panel.hidden = false;
+    root.classList.add('is-open');
+    launcher.setAttribute('aria-expanded', 'true');
+    window.setTimeout(() => input.focus(), 80);
+  }
+
+  function closePanel() {
+    panel.hidden = true;
+    root.classList.remove('is-open');
+    launcher.setAttribute('aria-expanded', 'false');
+    launcher.focus();
+  }
+
+  launcher.addEventListener('click', () => panel.hidden ? openPanel() : closePanel());
+  close.addEventListener('click', closePanel);
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !panel.hidden) closePanel();
+  });
+
+  document.querySelectorAll('.lang-button').forEach((button) => {
+    button.addEventListener('click', () => window.setTimeout(renderLanguage, 0));
+  });
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (waiting) return;
     const question = input.value.trim();
     if (!question) return;
-    const lang = document.documentElement.lang === 'en' ? 'en' : 'fr';
-    const previous = submit.textContent;
+
+    const currentLang = lang();
+    const c = copy[currentLang];
+    const recentHistory = conversation.slice(-6);
+    appendMessage('user', question);
+    conversation.push({ role: 'user', content: question });
+    input.value = '';
+    renderSuggestions();
+    waiting = true;
     submit.disabled = true;
-    submit.textContent = copy[lang].loading;
-    answer.hidden = false;
-    answer.classList.remove('is-error');
-    answerText.textContent = copy[lang].loading;
+    input.disabled = true;
+    const pending = appendMessage('assistant', c.loading, { temporary: true });
+
     try {
       const response = await fetch('/api/ai/faq', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ question, language: lang })
+        body: JSON.stringify({ question, language: currentLang, history: recentHistory })
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
-      answerText.textContent = data.answer || copy[lang].error;
+      const answer = data.answer || c.error;
+      pending.remove();
+      appendMessage('assistant', answer);
+      conversation.push({ role: 'assistant', content: answer });
     } catch (error) {
-      answer.classList.add('is-error');
-      answerText.textContent = error.message === 'ai_not_configured' ? copy[lang].notConfigured : copy[lang].error;
+      pending.remove();
+      const text = error.message === 'ai_not_configured' ? c.notConfigured : c.error;
+      appendMessage('assistant', text, { error: true });
     } finally {
+      waiting = false;
       submit.disabled = false;
-      submit.textContent = previous;
+      input.disabled = false;
+      input.focus();
     }
   });
+
+  renderLanguage();
 })();
+
