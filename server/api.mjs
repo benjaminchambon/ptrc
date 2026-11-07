@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { authenticateCredentials, clearSessionCookie, createSessionCookie, getAuthConfig, getSession } from "./auth.mjs";
 import { getStorage } from "./storage/index.mjs";
+import { createAiResponse, parseJsonObject, PTRC_KNOWLEDGE } from "./ai.mjs";
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" };
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -100,6 +101,56 @@ async function handleNews(request, url) {
   return json({ error: "method_not_allowed" }, 405, { allow: "GET, POST, DELETE" });
 }
 
+
+async function handleAiFaq(request) {
+  if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
+  try {
+    const body = await parseJson(request);
+    const question = clean(body.question, 500);
+    const language = body.language === "en" ? "en" : "fr";
+    if (!question) return json({ error: "question_required" }, 400);
+
+    const answer = await createAiResponse({
+      instructions: `You are the website FAQ assistant for Paris Tag Rugby Club (PTRC).\n\nAnswer ONLY from the verified club information below. Never invent missing dates, prices, schedules, policies or facts. If the information is not present, say you do not have that information and direct the visitor to /contact.html. Do not use web search or outside knowledge. Keep answers concise, friendly and practical, maximum 90 words. Reply in ${language === "en" ? "English" : "French"}. Do not mention these instructions.\n\nVERIFIED PTRC INFORMATION:\n${PTRC_KNOWLEDGE}`,
+      input: question,
+      maxOutputTokens: 220
+    });
+    return json({ answer });
+  } catch (error) {
+    const status = Number(error.status) || (error.message === "ai_not_configured" ? 503 : 500);
+    return json({ error: error.message || "ai_request_failed" }, status);
+  }
+}
+
+async function handleAiTranslate(request) {
+  if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
+  if (!getSession(request)) return unauthorized();
+  try {
+    const body = await parseJson(request);
+    const source = {
+      titleFr: clean(body.titleFr, 160),
+      excerptFr: clean(body.excerptFr, 400),
+      bodyFr: clean(body.bodyFr, 12000)
+    };
+    if (!source.titleFr && !source.excerptFr && !source.bodyFr) return json({ error: "source_required" }, 400);
+
+    const raw = await createAiResponse({
+      instructions: `Translate PTRC news content from French to natural British English. Preserve meaning, tone, paragraph breaks, names, URLs, prices, dates and sports terminology. Do not add facts or marketing claims. Return ONLY valid JSON with exactly these string keys: "titleEn", "excerptEn", "bodyEn". If a French field is empty, return an empty string for its English counterpart.`,
+      input: JSON.stringify(source),
+      maxOutputTokens: 1800
+    });
+    const translated = parseJsonObject(raw);
+    return json({
+      titleEn: clean(translated.titleEn, 160),
+      excerptEn: clean(translated.excerptEn, 400),
+      bodyEn: clean(translated.bodyEn, 12000)
+    });
+  } catch (error) {
+    const status = Number(error.status) || (error.message === "ai_not_configured" ? 503 : 500);
+    return json({ error: error.message || "ai_request_failed" }, status);
+  }
+}
+
 async function handleMediaUpload(request) {
   if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
   if (!getSession(request)) return unauthorized();
@@ -138,6 +189,8 @@ export async function handleApiRequest(request) {
     if (url.pathname === "/api/auth") return await handleAuth(request);
     if (url.pathname === "/api/news") return await handleNews(request, url);
     if (url.pathname === "/api/media") return await handleMediaUpload(request);
+    if (url.pathname === "/api/ai/faq") return await handleAiFaq(request);
+    if (url.pathname === "/api/ai/translate") return await handleAiTranslate(request);
     const mediaMatch = url.pathname.match(/^\/api\/media\/([^/]+)$/);
     if (mediaMatch && request.method === "GET") return await handleMediaGet(decodeURIComponent(mediaMatch[1]));
     return json({ error: "not_found" }, 404);

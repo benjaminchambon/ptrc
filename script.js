@@ -42,6 +42,22 @@ Object.assign(PTRC_TRANSLATIONS, {
 });
 
 Object.assign(PTRC_TRANSLATIONS, {
+  "FAQ intelligente":"Smart FAQ",
+  "Une question sur le club ?":"A question about the club?",
+  "Horaires, tarifs, première séance, règles… demande directement à l’assistant PTRC. Il répond uniquement à partir des informations du club.":"Training times, fees, first session, rules… ask the PTRC assistant directly. It only answers from verified club information.",
+  "Questions suggérées":"Suggested questions",
+  "Est-ce que je peux venir si je débute ?":"Can I come if I’m a beginner?",
+  "Combien coûte l’adhésion ?":"How much is membership?",
+  "Quand sont les entraînements ?":"When are training sessions?",
+  "Ta question":"Your question",
+  "Ex. Je n’ai jamais joué au rugby, je peux venir ?":"E.g. I’ve never played rugby, can I come?",
+  "Demander":"Ask",
+  "Réponse PTRC":"PTRC answer",
+  "L’assistant peut se tromper. Pour une information non disponible,":"The assistant can make mistakes. If information is unavailable,",
+  "contacte le club →":"contact the club →"
+});
+
+Object.assign(PTRC_TRANSLATIONS, {
   "Dernières nouvelles":"Latest news",
   "La vie du PTRC.":"Life at PTRC.",
   "Retrouve ici les actualités publiées par le club.":"Find the latest news published by the club here.",
@@ -340,4 +356,56 @@ if (ptrcTrialSteps) {
   loader.async = true;
   loader.dataset.feedId = feedId;
   slot.appendChild(loader);
+})();
+
+// Intelligent FAQ — public, grounded only in verified PTRC information server-side.
+(() => {
+  const root = document.querySelector('[data-ai-faq]');
+  if (!root) return;
+  const form = root.querySelector('[data-faq-form]');
+  const input = root.querySelector('[data-faq-input]');
+  const submit = root.querySelector('[data-faq-submit]');
+  const answer = root.querySelector('[data-faq-answer]');
+  const answerText = root.querySelector('[data-faq-answer-text]');
+  const suggestions = root.querySelectorAll('[data-faq-suggestion]');
+  if (!form || !input || !submit || !answer || !answerText) return;
+
+  const copy = {
+    fr: { loading: 'Je cherche…', error: 'Je n’arrive pas à répondre pour le moment. Tu peux contacter directement le club.', notConfigured: 'La FAQ IA n’est pas encore configurée. Tu peux contacter directement le club.' },
+    en: { loading: 'Checking…', error: 'I can’t answer right now. You can contact the club directly.', notConfigured: 'The AI FAQ is not configured yet. You can contact the club directly.' }
+  };
+
+  suggestions.forEach((button) => button.addEventListener('click', () => {
+    input.value = button.textContent.trim();
+    input.focus();
+  }));
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const question = input.value.trim();
+    if (!question) return;
+    const lang = document.documentElement.lang === 'en' ? 'en' : 'fr';
+    const previous = submit.textContent;
+    submit.disabled = true;
+    submit.textContent = copy[lang].loading;
+    answer.hidden = false;
+    answer.classList.remove('is-error');
+    answerText.textContent = copy[lang].loading;
+    try {
+      const response = await fetch('/api/ai/faq', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ question, language: lang })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+      answerText.textContent = data.answer || copy[lang].error;
+    } catch (error) {
+      answer.classList.add('is-error');
+      answerText.textContent = error.message === 'ai_not_configured' ? copy[lang].notConfigured : copy[lang].error;
+    } finally {
+      submit.disabled = false;
+      submit.textContent = previous;
+    }
+  });
 })();

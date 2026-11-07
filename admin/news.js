@@ -109,6 +109,43 @@ async function saveNews(event) {
   } finally { button.disabled = false; }
 }
 
+
+async function generateEnglishVersion() {
+  const button = $("generate-english");
+  const source = {
+    titleFr: $("title-fr").value.trim(),
+    excerptFr: $("excerpt-fr").value.trim(),
+    bodyFr: $("body-fr").value.trim()
+  };
+  if (!source.titleFr && !source.excerptFr && !source.bodyFr) {
+    $("editor-error").textContent = "Ajoute d’abord du contenu en français.";
+    return;
+  }
+  const hasEnglish = $("title-en").value.trim() || $("excerpt-en").value.trim() || $("body-en").value.trim();
+  if (hasEnglish && !confirm("Remplacer la version anglaise actuelle par une nouvelle traduction ?")) return;
+
+  const previousLabel = button.textContent;
+  button.disabled = true;
+  button.textContent = "Génération…";
+  $("editor-error").textContent = "";
+  try {
+    const translated = await api("/api/ai/translate", { method: "POST", body: JSON.stringify(source) });
+    $("title-en").value = translated.titleEn || "";
+    $("excerpt-en").value = translated.excerptEn || "";
+    $("body-en").value = translated.bodyEn || "";
+  } catch (error) {
+    const messages = {
+      ai_not_configured: "OpenAI n’est pas encore configuré sur Netlify.",
+      ai_request_failed: "L’appel OpenAI a échoué. Vérifie la clé API et les logs Netlify.",
+      source_required: "Ajoute d’abord du contenu en français."
+    };
+    $("editor-error").textContent = messages[error.message] || `Traduction impossible : ${error.message}`;
+  } finally {
+    button.disabled = false;
+    button.textContent = previousLabel;
+  }
+}
+
 async function deleteNews(item) {
   if (!confirm(`Supprimer « ${item.titleFr} » ?`)) return;
   try { await api(`/api/news?id=${encodeURIComponent(item.id)}`, { method: "DELETE" }); await loadNews(); if ($("news-id").value === item.id) closeEditor(); }
@@ -121,6 +158,7 @@ $("logout").addEventListener("click", async () => {
 $("new-news").addEventListener("click", () => openEditor());
 $("cancel-edit").addEventListener("click", closeEditor); $("cancel-edit-bottom").addEventListener("click", closeEditor);
 $("news-form").addEventListener("submit", saveNews);
+$("generate-english").addEventListener("click", generateEnglishVersion);
 $("news-image").addEventListener("change", () => { const file = $("news-image").files[0]; if (file) setPreview(URL.createObjectURL(file)); });
 $("remove-image").addEventListener("click", () => { $("news-image").value = ""; $("image-url").value = ""; setPreview(""); });
 

@@ -69,3 +69,20 @@ Les données Netlify sont stockées dans les stores `ptrc-content` et `ptrc-medi
 - contenu texte simple, sans éditeur riche.
 
 Ces limites permettent de valider le workflow avant d’ajouter comptes, rôles et PostgreSQL.
+
+
+## IA OpenAI (FAQ + traduction des actualités)
+
+Ajouter dans Netlify → Project configuration → Environment variables :
+
+```
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-6-luna
+```
+
+`OPENAI_MODEL` est optionnel ; `gpt-6-luna` est utilisé par défaut. Après modification des variables, relancer un deploy Netlify.
+
+- `/api/ai/faq` : route publique, question courte, réponse limitée aux informations PTRC intégrées côté serveur.
+- `/api/ai/translate` : route protégée par la session admin ; génère les champs anglais à partir des champs français.
+- La clé OpenAI reste exclusivement côté serveur et ne doit jamais être ajoutée dans GitHub.
+- Pour éviter une consommation inattendue, définir également un budget / usage limit sur le projet API OpenAI.
