@@ -553,3 +553,31 @@ if (ptrcTrialSteps) {
   renderLanguage();
 })();
 
+
+// PTRC privacy-friendly audience statistics.
+// No IP, cookie, fingerprint or personal identifier is stored. sessionStorage is
+// only used in the browser to count one visit per browsing session.
+(() => {
+  if (!/^https?:$/.test(window.location.protocol)) return;
+  if (navigator.globalPrivacyControl === true || navigator.doNotTrack === '1') return;
+
+  let visit = false;
+  try {
+    const key = 'ptrc-analytics-session';
+    if (!sessionStorage.getItem(key)) {
+      sessionStorage.setItem(key, '1');
+      visit = true;
+    }
+  } catch {
+    // If sessionStorage is unavailable, keep page-view counting but do not
+    // guess whether this is a new visit.
+  }
+
+  fetch('/api/analytics', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ page: window.location.pathname || '/', visit }),
+    keepalive: true,
+    credentials: 'omit'
+  }).catch(() => {});
+})();

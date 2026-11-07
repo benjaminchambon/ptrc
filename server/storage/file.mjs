@@ -5,6 +5,7 @@ import { randomUUID } from "node:crypto";
 const root = process.env.PTRC_DATA_DIR || join(process.cwd(), "data");
 const newsPath = join(root, "news.json");
 const mediaDir = join(root, "media");
+const analyticsPath = join(root, "analytics.json");
 
 async function ensureDir(path) { await mkdir(path, { recursive: true }); }
 
@@ -22,6 +23,22 @@ export async function writeNews(news) {
   const temp = `${newsPath}.tmp`;
   await writeFile(temp, JSON.stringify(news, null, 2), "utf8");
   await rename(temp, newsPath);
+}
+
+export async function readAnalytics() {
+  try {
+    return JSON.parse(await readFile(analyticsPath, "utf8"));
+  } catch (error) {
+    if (error?.code === "ENOENT") return { version: 1, days: {} };
+    throw error;
+  }
+}
+
+export async function writeAnalytics(analytics) {
+  await ensureDir(dirname(analyticsPath));
+  const temp = `${analyticsPath}.tmp`;
+  await writeFile(temp, JSON.stringify(analytics, null, 2), "utf8");
+  await rename(temp, analyticsPath);
 }
 
 const extensions = {

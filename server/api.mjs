@@ -160,6 +160,106 @@ async function handleAiTranslate(request) {
   }
 }
 
+
+function parisDateKey(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit"
+  }).formatToParts(date).reduce((acc, part) => {
+    if (part.type !== "literal") acc[part.type] = part.value;
+    return acc;
+  }, {});
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
+
+function recentDateKeys(count) {
+  const today = parisDateKey();
+  const [year, month, day] = today.split("-").map(Number);
+  const base = Date.UTC(year, month - 1, day, 12);
+  return Array.from({ length: count }, (_, index) => new Date(base - index * 86400000).toISOString().slice(0, 10)).reverse();
+}
+
+const ANALYTICS_PUBLIC_PAGES = new Set([
+  "/", "/actualites.html", "/club.html", "/contact.html", "/entrainements.html",
+  "/merci.html", "/partenaires.html", "/regles.html", "/tag-rugby.html", "/tournois.html"
+]);
+
+function normalizeAnalyticsPage(value) {
+  let page = clean(value, 160).split("?")[0].split("#")[0];
+  if (!page.startsWith("/")) page = `/${page}`;
+  if (page === "/index.html") page = "/";
+  return ANALYTICS_PUBLIC_PAGES.has(page) ? page : "";
+}
+
+function analyticsRange(days, keys) {
+  return keys.reduce((acc, key) => {
+    const day = days[key];
+    if (!day) return acc;
+    acc.visits += Number(day.visits) || 0;
+    acc.pageViews += Number(day.pageViews) || 0;
+    return acc;
+  }, { visits: 0, pageViews: 0 });
+}
+
+async function handleAnalytics(request) {
+  const storage = await getStorage();
+
+  if (request.method === "POST") {
+    try {
+      const body = await parseJson(request);
+      const page = normalizeAnalyticsPage(body.page);
+      if (!page) return json({ tracked: false }, 200);
+
+      const analytics = await storage.readAnalytics();
+      analytics.version = 1;
+      analytics.days = analytics.days && typeof analytics.days === "object" ? analytics.days : {};
+      const date = parisDateKey();
+      const day = analytics.days[date] || { visits: 0, pageViews: 0, pages: {} };
+      day.pageViews = (Number(day.pageViews) || 0) + 1;
+      day.visits = (Number(day.visits) || 0) + (body.visit === true ? 1 : 0);
+      day.pages = day.pages && typeof day.pages === "object" ? day.pages : {};
+      day.pages[page] = (Number(day.pages[page]) || 0) + 1;
+      analytics.days[date] = day;
+
+      const keep = new Set(recentDateKeys(90));
+      Object.keys(analytics.days).forEach((key) => { if (!keep.has(key)) delete analytics.days[key]; });
+      await storage.writeAnalytics(analytics);
+      return json({ tracked: true }, 201);
+    } catch (error) {
+      return json({ error: error.message || "invalid_request" }, 400);
+    }
+  }
+
+  if (request.method === "GET") {
+    if (!getSession(request)) return unauthorized();
+    const analytics = await storage.readAnalytics();
+    const days = analytics.days && typeof analytics.days === "object" ? analytics.days : {};
+    const keys30 = recentDateKeys(30);
+    const keys7 = keys30.slice(-7);
+    const todayKey = keys30[keys30.length - 1];
+    const today = analyticsRange(days, [todayKey]);
+    const last7 = analyticsRange(days, keys7);
+    const last30 = analyticsRange(days, keys30);
+    const pages = {};
+    keys30.forEach((key) => {
+      const perPage = days[key]?.pages || {};
+      Object.entries(perPage).forEach(([page, count]) => {
+        pages[page] = (pages[page] || 0) + (Number(count) || 0);
+      });
+    });
+    const topPages = Object.entries(pages)
+      .map(([page, pageViews]) => ({ page, pageViews }))
+      .sort((a, b) => b.pageViews - a.pageViews || a.page.localeCompare(b.page));
+    const daily = keys30.map((date) => ({
+      date,
+      visits: Number(days[date]?.visits) || 0,
+      pageViews: Number(days[date]?.pageViews) || 0
+    }));
+    return json({ today, last7, last30, topPages, daily, generatedAt: new Date().toISOString() });
+  }
+
+  return json({ error: "method_not_allowed" }, 405, { allow: "GET, POST" });
+}
+
 async function handleMediaUpload(request) {
   if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, { allow: "POST" });
   if (!getSession(request)) return unauthorized();
@@ -197,6 +297,7 @@ export async function handleApiRequest(request) {
     const url = new URL(request.url);
     if (url.pathname === "/api/auth") return await handleAuth(request);
     if (url.pathname === "/api/news") return await handleNews(request, url);
+    if (url.pathname === "/api/analytics") return await handleAnalytics(request);
     if (url.pathname === "/api/media") return await handleMediaUpload(request);
     if (url.pathname === "/api/ai/faq") return await handleAiFaq(request);
     if (url.pathname === "/api/ai/translate") return await handleAiTranslate(request);

@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 const region = process.env.PTRC_BLOBS_REGION || "eu-central-1";
 const contentStore = () => getStore("ptrc-content", { region });
 const mediaStore = () => getStore("ptrc-media", { region });
+const analyticsStore = () => getStore("ptrc-analytics", { region });
 
 export async function listNews() {
   return (await contentStore().get("news.json", { type: "json", consistency: "strong" })) || [];
@@ -11,6 +12,14 @@ export async function listNews() {
 
 export async function writeNews(news) {
   await contentStore().setJSON("news.json", news);
+}
+
+export async function readAnalytics() {
+  return (await analyticsStore().get("summary.json", { type: "json", consistency: "strong" })) || { version: 1, days: {} };
+}
+
+export async function writeAnalytics(analytics) {
+  await analyticsStore().setJSON("summary.json", analytics);
 }
 
 const extensions = {

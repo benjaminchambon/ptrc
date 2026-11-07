@@ -16,8 +16,8 @@ async function api(path, options = {}) {
   return data;
 }
 
-function goToNewsAdmin() {
-  window.location.replace("/admin/news.html");
+function goToAdmin() {
+  window.location.replace("/admin/dashboard.html");
 }
 
 $("login-form").addEventListener("submit", async (event) => {
@@ -35,7 +35,7 @@ $("login-form").addEventListener("submit", async (event) => {
       })
     });
     $("login-password").value = "";
-    goToNewsAdmin();
+    goToAdmin();
   } catch (error) {
     $("login-password").value = "";
     $("login-error").textContent = error.message === "not_configured"
@@ -50,7 +50,7 @@ $("login-form").addEventListener("submit", async (event) => {
   try {
     const status = await api("/api/auth");
     if (status.authenticated) {
-      goToNewsAdmin();
+      goToAdmin();
       return;
     }
     if (!status.configured) {

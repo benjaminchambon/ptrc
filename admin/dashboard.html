@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <title>PTRC Admin — Statistiques</title>
+  <link href="../favicon.ico" rel="icon" sizes="any"/>
+  <link href="admin.css" rel="stylesheet"/>
+</head>
+<body>
+  <main class="admin-shell">
+    <header class="admin-header">
+      <a class="admin-brand" href="../index.html"><img src="../logo-paris-tag-rugby.png" alt="Paris Tag Rugby Club"/><span>PTRC <strong>Admin</strong></span></a>
+      <div class="admin-header-actions">
+        <a class="admin-nav-active" href="dashboard.html">Dashboard</a>
+        <a href="news.html">Actualités</a>
+        <a href="../index.html" target="_blank" rel="noreferrer">Voir le site ↗</a>
+        <button class="admin-link-button" id="logout" type="button">Se déconnecter</button>
+      </div>
+    </header>
+
+    <section class="admin-app" id="admin-app" hidden>
+      <div class="admin-toolbar">
+        <div><span class="admin-eyebrow">Vue d’ensemble</span><h1>Statistiques</h1><p>Une mesure simple de la fréquentation du site, sans stocker d’adresse IP ni de données personnelles.</p></div>
+        <button class="admin-secondary" id="refresh-stats" type="button">Actualiser</button>
+      </div>
+
+      <section class="admin-stat-grid" aria-label="Résumé des statistiques">
+        <article class="admin-stat-card">
+          <span>Aujourd’hui</span>
+          <strong id="today-visits">—</strong>
+          <small><b id="today-views">—</b> pages vues</small>
+        </article>
+        <article class="admin-stat-card">
+          <span>7 derniers jours</span>
+          <strong id="week-visits">—</strong>
+          <small><b id="week-views">—</b> pages vues</small>
+        </article>
+        <article class="admin-stat-card">
+          <span>30 derniers jours</span>
+          <strong id="month-visits">—</strong>
+          <small><b id="month-views">—</b> pages vues</small>
+        </article>
+      </section>
+
+      <div class="admin-stats-layout">
+        <section class="admin-stats-panel">
+          <div class="admin-stats-panel-head"><div><span class="admin-eyebrow">Tendance</span><h2>14 derniers jours</h2></div><span class="admin-muted-inline">Pages vues</span></div>
+          <div class="admin-bar-chart" id="daily-chart"><p class="admin-muted">Chargement…</p></div>
+        </section>
+
+        <section class="admin-stats-panel">
+          <div class="admin-stats-panel-head"><div><span class="admin-eyebrow">Contenu</span><h2>Pages les plus vues</h2></div><span class="admin-muted-inline">30 jours</span></div>
+          <div class="admin-top-pages" id="top-pages"><p class="admin-muted">Chargement…</p></div>
+        </section>
+      </div>
+      <p class="admin-stats-note" id="stats-note"></p>
+      <p class="admin-error" id="stats-error" role="alert"></p>
+    </section>
+  </main>
+  <script type="module" src="dashboard.js"></script>
+</body>
+</html>

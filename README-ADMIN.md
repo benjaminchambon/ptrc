@@ -5,8 +5,10 @@ Cette V1 ajoute un backoffice dédié aux **Actualités** sans coupler l’inter
 ## URLs
 
 - Site public : `/actualites.html`
-- Backoffice : `/admin/`
-- API : `/api/auth`, `/api/news`, `/api/media`
+- Backoffice : `/admin/` (redirige vers le dashboard après connexion)
+- Statistiques : `/admin/dashboard.html`
+- Actualités : `/admin/news.html`
+- API : `/api/auth`, `/api/news`, `/api/media`, `/api/analytics`
 
 ## Architecture portable
 
@@ -56,9 +58,9 @@ PORT=$PORT node server/local-server.mjs
    - `PTRC_STORAGE=netlify`
    - `PTRC_BLOBS_REGION=eu-central-1` (optionnel, valeur par défaut du projet)
 4. Déployer.
-5. Ouvrir `/admin/` et publier la première actualité.
+5. Ouvrir `/admin/` pour accéder au dashboard et aux actualités.
 
-Les données Netlify sont stockées dans les stores `ptrc-content` et `ptrc-media`.
+Les données Netlify sont stockées dans les stores `ptrc-content`, `ptrc-media` et `ptrc-analytics`.
 
 ## Limites volontaires du POC
 
@@ -91,3 +93,20 @@ OPENAI_MODEL=gpt-6-luna
 ## Assistant IA flottant
 
 L'assistant FAQ est affiché sur toutes les pages publiques via `script.js`. Il utilise `POST /api/ai/faq` et conserve les derniers échanges uniquement dans la page courante pour comprendre les questions de suivi. La clé OpenAI reste côté serveur dans `OPENAI_API_KEY`.
+
+
+## Statistiques de fréquentation
+
+Le site public envoie un compteur minimal vers `POST /api/analytics` à chaque page vue. Le dashboard protégé récupère les agrégats via `GET /api/analytics`.
+
+Le dashboard affiche :
+
+- visites et pages vues aujourd’hui ;
+- visites et pages vues sur 7 jours ;
+- visites et pages vues sur 30 jours ;
+- tendance des pages vues sur les 14 derniers jours ;
+- pages les plus consultées sur 30 jours.
+
+Une **visite** correspond à une session de navigation (`sessionStorage`) et non à une personne unique. Aucun cookie analytics, aucune adresse IP et aucun fingerprint n’est enregistré par le code PTRC. Les données sont agrégées par jour et conservées 90 jours. Le tracking respecte également Global Privacy Control / Do Not Track lorsqu’ils sont activés.
+
+Les statistiques commencent à être collectées après le déploiement de cette version ; elles ne reconstruisent pas l’historique antérieur.
